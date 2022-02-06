@@ -1,1 +1,1 @@
-web: gunicorn app:stock_viewer
+web: gunicorn stock_viewer:server
