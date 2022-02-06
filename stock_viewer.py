@@ -86,7 +86,7 @@ app.layout = html.Div(
     Input('yaxis-column', 'value'))
 def update_graph(n_clicks, selected_stock, selected_metric):
     if n_clicks > 0:
-        dff = stock_data.main(str(selected_stock))
+        dff = stock_data.extract_timeSeriesStore(str(selected_stock))
         dff.sort_values(by=['Date'], ascending=True, inplace=True)
         fig = px.bar(dff, x="Date", y=selected_metric, color="Ticker", barmode="group")
         fig.update_xaxes(type='category')
