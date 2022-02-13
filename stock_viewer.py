@@ -46,24 +46,25 @@ app.layout = html.Div(
             children=[
                 html.Div(
                     children=[
-                        html.Div(children="Stock Ticker", className="menu-title", style={'margin': 10 }),
-                        dcc.Textarea(
+                        html.Div(children="Stock Ticker", className="menu-title"),
+                        dcc.Input(
                             id='xaxis-column',
-                            value='CRWD',
-                            style={'width': '100%', 'height': 20},
+                            placeholder='Ticker Symbol',
+                            value = 'TSLA',
+                            style={'width': '80%', 'height': '25%', 'font-size': '16px', 'margin-top': '5px'},
+                            type='text'
                         ),
-                        html.Button('Submit', id='textarea-state-example-button', n_clicks=0),
+                        html.Button('SUBMIT', id='text-submit-button', n_clicks=0, style = {'margin-top': '5px'}),
                     ]
                 ),
                 html.Div(
                     children=[
-                        html.Div(children="Metric", className="menu-title", style={'margin': 10 }),
+                        html.Div(children="Metric", className="menu-title"),
                         dcc.Dropdown(
                             id='yaxis-column',
                             options=[{'label': i, 'value': i} for i in data.columns],
                             value='TotalRevenue',
                             className="dropdown",
-                            style={'margin': 10 },
                         ),
                     ],
                 ),
@@ -81,19 +82,13 @@ app.layout = html.Div(
 
 @app.callback(
     Output('stock-bar-chart', 'figure'),
-    Input('textarea-state-example-button', 'n_clicks'),
+    Input('text-submit-button', 'n_clicks'),
     State('xaxis-column', 'value'),
     Input('yaxis-column', 'value'))
 def update_graph(n_clicks, selected_stock, selected_metric):
-    if n_clicks > 0:
         dff = stock_data.extract_timeSeriesStore(str(selected_stock))
-        dff.sort_values(by=['Date'], ascending=True, inplace=True)
-        fig = px.bar(dff, x="Date", y=selected_metric, color="Ticker", barmode="group")
-        fig.update_xaxes(type='category')
-        return fig
-    else:
         data.sort_values(by=['Date'], ascending=True, inplace=True)
-        fig = px.bar(data, x="Date", y=selected_metric, color="Ticker", barmode="group")
+        fig = px.bar(dff, x="Date", y=selected_metric, color="Ticker", barmode="group")
         fig.update_xaxes(type='category')
         return fig
 
