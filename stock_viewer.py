@@ -3,6 +3,8 @@ from dash import dcc
 from dash import html
 from dash.dcc.Dropdown import Dropdown
 from dash.dependencies import Output, Input, State
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 from yf_scraper import stock_data
@@ -77,20 +79,36 @@ app.layout = html.Div(
                 ],
                 className="wrapper",
         ),
+        html.Div(
+            children=[
+                html.Div(dcc.Graph(id='stock-bar-chart-2'), className="card",)
+                ],
+                className="wrapper",
+        ),
     ]
 )
 
 @app.callback(
+    Output('yaxis-column', 'options'),
     Output('stock-bar-chart', 'figure'),
+    Output('stock-bar-chart-2', 'figure'),
     Input('text-submit-button', 'n_clicks'),
     State('xaxis-column', 'value'),
     Input('yaxis-column', 'value'))
 def update_graph(n_clicks, selected_stock, selected_metric):
         dff = stock_data.extract_timeSeriesStore(str(selected_stock))
         data.sort_values(by=['Date'], ascending=True, inplace=True)
+
         fig = px.bar(dff, x="Date", y=selected_metric, color="Ticker", barmode="group")
         fig.update_xaxes(type='category')
-        return fig
+
+        fig_2 = make_subplots(rows=1, cols=2, subplot_titles=["TotalRevenue","NetIncome"])
+        fig_2.add_trace(go.Bar(x=dff["Date"], y=dff["TotalRevenue"], name="TotalRevenue"), row=1, col=1)
+        fig_2.add_trace(go.Bar(x=dff["Date"], y=dff["NetIncome"], name="NetIncome"), row=1, col=2)
+        fig_2.update_xaxes(type='category')
+
+        options=[{'label': i, 'value': i} for i in dff.columns]
+        return options, fig, fig_2
 
 if __name__ == "__main__":
     app.run_server(debug=True)

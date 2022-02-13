@@ -104,6 +104,7 @@ def extract_timeSeriesStore(ticker):
     df = df.groupby(['Date']).sum()
     df.reset_index(inplace=True)
     df['Ticker'] = ticker
+    df = df.reindex(sorted(df.columns), axis=1)
     
     return df
 
